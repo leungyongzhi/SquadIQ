@@ -35,25 +35,29 @@ export default function LinkingRequestsPage() {
     }, [isAdmin, isSuperAdmin]);
 
     const loadRequests = async () => {
-        const query = supabase
-            .from("linking_requests")
-            .select(`
-                *,
-                user:user_id(full_name),
-                player:player_id(name),
-                community:community_id(name)
-            `);
+        try {
+            let query = supabase
+                .from("linking_requests")
+                .select("*");
 
-        if (filter === "pending") {
-            query.eq("status", "pending");
-        }
+            if (filter === "pending") {
+                query = query.eq("status", "pending");
+            }
 
-        const { data, error } = await query.order("created_at", { ascending: false });
+            const { data, error } = await query.order("created_at", { ascending: false });
 
-        if (error) {
-            console.error("Error loading requests:", error);
-        } else {
-            setRequests(data ?? []);
+            console.log("Linking requests query result:", { data, error });
+
+            if (error) {
+                console.error("Error loading requests:", error);
+                alert(`Error: ${error.message}`);
+            } else {
+                console.log("Loaded requests:", data);
+                setRequests(data ?? []);
+            }
+        } catch (err) {
+            console.error("Exception loading requests:", err);
+            alert(`Exception: ${err}`);
         }
         setLoading(false);
     };
