@@ -43,6 +43,7 @@ const navItems = [
 
 const adminNavItems = [
     { href: "/reports", label: "Reports", icon: PieChart01 },
+    { href: "/linking-requests", label: "Linking Requests", icon: Users01 },
 ];
 
 export default function FootballLayout({ children }: { children: React.ReactNode }) {
