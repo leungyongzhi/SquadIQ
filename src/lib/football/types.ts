@@ -1,30 +1,71 @@
-export type Position = "attack" | "defense" | "goalkeeper";
 export type FormRating = "hot" | "neutral" | "cold";
 export type MatchStatus = "scheduled" | "in_progress" | "completed";
 export type TeamColor = "blue" | "orange";
+export type UserRole = "super_admin" | "admin" | "player";
+export type CommunityRole = "admin" | "player";
+
+// 1=DEF+, 2=DEF, 3=BAL, 4=ATK, 5=ATK+
+export const POSITION_LABELS = ["DEF+", "DEF", "BAL", "ATK", "ATK+"] as const;
 
 export interface Player {
     id: string;
     created_at: string;
     name: string;
-    rating: number; // 1–6, admin only
-    position_bias: number; // 1=Pure DEF, 3=Balanced, 5=Pure ATK
-    is_goalkeeper: boolean;
-    gk_rating: number | null; // 1–6
-    outfield_rating: number | null; // 1–6 (used when is_goalkeeper=true for outfield play)
     is_active: boolean;
-    user_id: string | null; // linked auth user
+    user_id: string | null;
     avatar_url: string | null;
-    intended_role: "admin" | "player" | null;
+    intended_role: UserRole | null;
+    rating: number;
+    position_bias: number;
+    is_goalkeeper: boolean;
+    gk_rating: number | null;
+    outfield_rating: number | null;
+    form_rating: FormRating | null;
+}
+
+export interface Community {
+    id: string;
+    created_at: string;
+    name: string;
+    description: string | null;
+    sport_type: string | null;
+    created_by: string | null;
+    default_payment_link: string | null;
+    default_payment_amount: number | null;
+    default_payment_message: string | null;
+    payment_currency: string;
+    bank_details: string | null;
+    info: string | null;
+    community_details: Record<string, any> | null;
+    is_active: boolean;
+}
+
+export interface CommunityMember {
+    id: string;
+    created_at: string;
+    community_id: string;
+    player_id: string;
+    role: CommunityRole;
+    rating: number;
+    position_bias: number;
+    is_goalkeeper: boolean;
+    gk_rating: number | null;
+    outfield_rating: number | null;
+}
+
+export interface CommunityMemberWithPlayer extends CommunityMember {
+    player: Player;
 }
 
 export interface MatchEvent {
     id: string;
     created_at: string;
+    community_id: string | null;
     title: string;
-    event_date: string; // ISO date string
-    event_time: string; // HH:MM
+    event_date: string;
+    event_time: string;
     location: string | null;
+    maps_link: string | null;
     status: MatchStatus;
     team_blue_ids: string[];
     team_orange_ids: string[];
@@ -57,55 +98,24 @@ export interface Goal {
     minute: number | null;
 }
 
-export interface PotmVote {
+export interface UserProfile {
     id: string;
-    created_at: string;
-    event_id: string;
-    voter_id: string;
-    nominee_id: string;
+    full_name: string | null;
+    role: UserRole;
+    player_id: string | null;
 }
 
-// Extended types with joins
-export interface EnrollmentWithPlayer extends EventEnrollment {
-    player: Player;
-}
-
-export interface GoalWithPlayers extends Goal {
-    scorer: Player;
-    assister: Player | null;
-}
-
-// Team generation types
-export interface TeamGenerationInput {
-    players: (Player & { form: FormRating })[];
-}
+export type PlayerForTeam = CommunityMember & {
+    name: string;
+    avatar_url: string | null;
+    form: FormRating;
+};
 
 export interface GeneratedTeams {
-    blue: Player[];
-    orange: Player[];
-    gkBlue: Player | null;
-    gkOrange: Player | null;
+    blue: PlayerForTeam[];
+    orange: PlayerForTeam[];
+    gkBlueId: string | null;
+    gkOrangeId: string | null;
     blueRating: number;
     orangeRating: number;
-}
-
-// Stats types
-export interface PlayerStats {
-    player: Player;
-    goals: number;
-    assists: number;
-    matches: number;
-    wins: number;
-    draws: number;
-    losses: number;
-    potm_awards: number;
-    win_rate: number;
-}
-
-export interface ChemistryPair {
-    player_a: Player;
-    player_b: Player;
-    wins_together: number;
-    matches_together: number;
-    win_rate: number;
 }

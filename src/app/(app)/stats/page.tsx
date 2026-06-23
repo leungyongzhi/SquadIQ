@@ -31,6 +31,7 @@ export default function StatsPage() {
     const [tab, setTab] = useState<Tab>("Overview");
     const [playerStats, setPlayerStats] = useState<PlayerStat[]>([]);
     const [chemistry, setChemistry] = useState<ChemistryPair[]>([]);
+    const [unclaimedGoals, setUnclaimedGoals] = useState(0);
     const [loading, setLoading] = useState(true);
     const supabase = createClient();
 
@@ -54,6 +55,7 @@ export default function StatsPage() {
             });
 
             // Goals & assists
+            const unclaimedGoalsCount = goals.filter((g: any) => !g.scorer_id).length;
             goals.forEach((g: any) => {
                 if (statsMap[g.scorer_id]) statsMap[g.scorer_id].goals++;
                 if (g.assister_id && statsMap[g.assister_id]) statsMap[g.assister_id].assists++;
@@ -90,6 +92,7 @@ export default function StatsPage() {
 
             const statsArr = Object.values(statsMap).filter((s) => s.matches > 0 || s.goals > 0);
             setPlayerStats(statsArr);
+            setUnclaimedGoals(unclaimedGoalsCount);
 
             // Chemistry: pairs who played together and their win rate
             const pairMap: Record<string, ChemistryPair> = {};
@@ -287,11 +290,23 @@ export default function StatsPage() {
             )}
 
             {tab === "Goals & Assists" && (
-                <div className="bg-primary rounded-xl border border-secondary overflow-hidden">
-                    <div className="p-4 border-b border-secondary">
-                        <h2 className="text-base font-semibold text-primary">Goals + Assists Leaderboard</h2>
-                    </div>
-                    <div className="divide-y divide-secondary">
+                <div className="space-y-4">
+                    {unclaimedGoals > 0 && (
+                        <div className="bg-primary rounded-xl border border-secondary p-4 flex items-center gap-3">
+                            <div className="size-10 rounded-lg bg-warning-secondary flex items-center justify-center flex-shrink-0">
+                                <Target01 className="size-5 text-warning-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-primary">{unclaimedGoals} Unclaimed Goals</p>
+                                <p className="text-xs text-tertiary">Goals counted toward the score but credited to no player</p>
+                            </div>
+                        </div>
+                    )}
+                    <div className="bg-primary rounded-xl border border-secondary overflow-hidden">
+                        <div className="p-4 border-b border-secondary">
+                            <h2 className="text-base font-semibold text-primary">Goals + Assists Leaderboard</h2>
+                        </div>
+                        <div className="divide-y divide-secondary">
                         {topGA.map((s, i) => {
                             const ga = s.goals + s.assists;
                             const gpg = s.matches > 0 ? (s.goals / s.matches).toFixed(2) : "0.00";
@@ -324,6 +339,7 @@ export default function StatsPage() {
                             <p className="text-sm text-tertiary text-center py-12">No goals recorded yet</p>
                         )}
                     </div>
+                </div>
                 </div>
             )}
         </div>
