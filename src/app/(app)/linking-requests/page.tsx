@@ -347,6 +347,8 @@ function RequestCard({
                     {request.status === "rejected" && request.rejection_reason && (
                         <p className="mt-2 text-sm text-error-primary">Reason: {request.rejection_reason}</p>
                     )}
+                    </div>
+                </div>
                 </div>
             </div>
         </div>
