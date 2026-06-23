@@ -808,7 +808,7 @@ export default function PlayersPage() {
             const visibleComms = superAdmin
                 ? (allComms ?? [])
                 : (allComms ?? []).filter((c) => myComms.includes(c.id));
-            setCommunities(visibleComms);
+            setCommunities(visibleComms as any);
 
             // Set default tab
             const defaultTab = superAdmin ? "all" : (myComms[0] ?? "global");
