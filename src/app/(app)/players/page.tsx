@@ -540,13 +540,14 @@ function StatsRow({ stats }: { stats: PlayerStats }) {
     );
 }
 
-function PlayerCard({ player, stats, isAdmin, isPublic, communityNames, showCommunities, onEdit, onDelete, onLink, onFormChange }: {
+function PlayerCard({ player, stats, isAdmin, isPublic, communityNames, showCommunities, hasLinkedAccount, onEdit, onDelete, onLink, onFormChange }: {
     player: Player;
     stats: PlayerStats;
     isAdmin: boolean;
     isPublic: boolean;
     communityNames: string[];
     showCommunities: boolean;
+    hasLinkedAccount?: boolean;
     onEdit: () => void;
     onDelete: () => void;
     onLink: () => void;
@@ -589,6 +590,9 @@ function PlayerCard({ player, stats, isAdmin, isPublic, communityNames, showComm
                         <span className={cx("text-xs font-medium", pos.color)}>{pos.label}</span>
                         {player.is_goalkeeper && (
                             <span className="text-xs font-semibold text-warning-primary bg-warning-primary rounded px-1">GK</span>
+                        )}
+                        {hasLinkedAccount && (
+                            <span className="text-xs font-semibold text-success-primary bg-success-primary rounded px-1">Linked</span>
                         )}
                     </div>
                     {isAdmin && (
@@ -714,6 +718,14 @@ export default function PlayersPage() {
                 .from("players").select("*").eq("is_active", true).order("name");
             const playerIds = (ps ?? []).map((p) => p.id);
 
+            // Fetch linked user accounts
+            const { data: linkedAccounts } = await supabase
+                .from("user_profiles")
+                .select("player_id")
+                .in("player_id", playerIds.length ? playerIds : ["none"]);
+
+            const linkedPlayerIds = new Set((linkedAccounts ?? []).map((u: any) => u.player_id));
+
             // Fetch all community memberships + community names
             const { data: memberships } = await supabase
                 .from("community_members")
@@ -731,6 +743,7 @@ export default function PlayersPage() {
             const playersWithComms = (ps ?? []).map((p) => ({
                 ...p,
                 communityNames: communityMap[p.id] ?? [],
+                hasLinkedAccount: linkedPlayerIds.has(p.id),
             }));
 
             const [eventsRes, goalsRes] = await Promise.all([
@@ -745,11 +758,20 @@ export default function PlayersPage() {
             const { data: ps } = await supabase
                 .from("players").select("*").eq("is_active", true).eq("is_public", true).order("name");
             const playerIds = (ps ?? []).map((p) => p.id);
+
+            // Fetch linked user accounts
+            const { data: linkedAccounts } = await supabase
+                .from("user_profiles")
+                .select("player_id")
+                .in("player_id", playerIds.length ? playerIds : ["none"]);
+
+            const linkedPlayerIds = new Set((linkedAccounts ?? []).map((u: any) => u.player_id));
+
             const [eventsRes, goalsRes] = await Promise.all([
                 supabase.from("match_events").select("team_blue_ids, team_orange_ids, player_of_match_id").eq("status", "completed"),
                 supabase.from("goals").select("scorer_id, assister_id").in("scorer_id", playerIds.length ? playerIds : ["none"]),
             ]);
-            setPlayers((ps ?? []).map((p) => ({ ...p, communityNames: [] })));
+            setPlayers((ps ?? []).map((p) => ({ ...p, communityNames: [], hasLinkedAccount: linkedPlayerIds.has(p.id) })));
             setStats(computeStats(playerIds, eventsRes.data ?? [], goalsRes.data ?? []));
 
         } else {
@@ -768,6 +790,14 @@ export default function PlayersPage() {
             const communityPlayers = (members ?? []).map((m: any) => m.player).filter(Boolean);
             const playerIds = communityPlayers.map((p: any) => p.id);
 
+            // Fetch linked user accounts
+            const { data: linkedAccounts } = await supabase
+                .from("user_profiles")
+                .select("player_id")
+                .in("player_id", playerIds.length ? playerIds : ["none"]);
+
+            const linkedPlayerIds = new Set((linkedAccounts ?? []).map((u: any) => u.player_id));
+
             const [eventsRes, goalsRes] = await Promise.all([
                 supabase.from("match_events")
                     .select("team_blue_ids, team_orange_ids, player_of_match_id")
@@ -776,7 +806,7 @@ export default function PlayersPage() {
                     .select("scorer_id, assister_id, match_events!inner(community_id)")
                     .eq("match_events.community_id", tab),
             ]);
-            setPlayers(communityPlayers.map((p: any) => ({ ...p, communityNames: [] })));
+            setPlayers(communityPlayers.map((p: any) => ({ ...p, communityNames: [], hasLinkedAccount: linkedPlayerIds.has(p.id) })));
             setStats(computeStats(playerIds, eventsRes.data ?? [], goalsRes.data ?? []));
         }
         setLoading(false);
@@ -1034,6 +1064,7 @@ export default function PlayersPage() {
                             isPublic={(player as any).is_public ?? false}
                             communityNames={player.communityNames ?? []}
                             showCommunities={selectedTab === "all" && isSuperAdmin}
+                            hasLinkedAccount={(player as any).hasLinkedAccount}
                             onEdit={() => { setEditingPlayer(player); setShowForm(true); }}
                             onDelete={() => handleDelete(player.id)}
                             onLink={() => setLinkingPlayer(player)}
