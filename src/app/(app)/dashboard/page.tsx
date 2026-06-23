@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useViewMode } from "@/app/(app)/layout";
-import { Copy, Check, Link01, Users01, BarChart01, Calendar } from "@untitledui/icons";
+import { Copy0707, CheckCircle, Link01, Users01, BarChart01, Calendar } from "@untitledui/icons";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -13,7 +13,7 @@ export default function DashboardPage() {
     const [linkedPlayerId, setLinkedPlayerId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [linkingCode, setLinkingCode] = useState<string | null>(null);
-    const [showCopySuccess, setShowCopySuccess] = useState(false);
+    const [showCopy07Success, setShowCopy07Success] = useState(false);
     const supabase = createClient();
 
     useEffect(() => {
@@ -44,8 +44,8 @@ export default function DashboardPage() {
     const copyLinkingCode = () => {
         if (linkingCode) {
             navigator.clipboard.writeText(linkingCode);
-            setShowCopySuccess(true);
-            setTimeout(() => setShowCopySuccess(false), 2000);
+            setShowCopy07Success(true);
+            setTimeout(() => setShowCopy07Success(false), 2000);
         }
     };
 
@@ -150,10 +150,10 @@ export default function DashboardPage() {
                                             onClick={copyLinkingCode}
                                             className="px-3 py-2 bg-secondary hover:bg-secondary_hover text-primary rounded-lg transition duration-100 ease-linear"
                                         >
-                                            {showCopySuccess ? (
-                                                <Check className="size-5 text-success-primary" />
+                                            {showCopy07Success ? (
+                                                <CheckCircle className="size-5 text-success-primary" />
                                             ) : (
-                                                <Copy className="size-5" />
+                                                <Copy07 className="size-5" />
                                             )}
                                         </button>
                                     </div>
