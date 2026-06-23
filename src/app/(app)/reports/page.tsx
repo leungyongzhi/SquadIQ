@@ -308,24 +308,24 @@ export default function ReportsPage() {
                     {sortedPlayers.length === 0 ? (
                         <p className="text-sm text-tertiary text-center py-8">No data yet.</p>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-3 overflow-x-auto">
                             {sortedPlayers.map((p, i) => {
                                 const stat = activeTab === "goals" ? p.goals : activeTab === "assists" ? p.assists : p.potm;
                                 const rankColor = i === 0 ? "text-warning-primary" : i === 1 ? "text-quaternary" : i === 2 ? "text-tertiary" : "text-quaternary";
                                 return (
-                                    <div key={p.id} className="flex items-center gap-4">
-                                        <span className={cx("w-5 text-sm font-bold text-right flex-shrink-0", rankColor)}>{i + 1}</span>
+                                    <div key={p.id} className="flex items-center gap-2 md:gap-4 min-w-min md:min-w-0">
+                                        <span className={cx("w-5 text-xs md:text-sm font-bold text-right flex-shrink-0", rankColor)}>{i + 1}</span>
                                         <div className="size-8 rounded-full bg-secondary flex items-center justify-center text-xs font-semibold text-secondary flex-shrink-0 overflow-hidden">
                                             {p.avatar ? <img src={p.avatar} className="size-8 object-cover" alt="" /> : p.name[0]}
                                         </div>
-                                        <span className="text-sm font-medium text-primary w-36 truncate flex-shrink-0">{p.name}</span>
-                                        <div className="flex-1">
+                                        <span className="text-xs md:text-sm font-medium text-primary w-28 md:w-36 truncate flex-shrink-0">{p.name}</span>
+                                        <div className="flex-1 hidden md:block">
                                             <MiniBar value={stat} max={maxStat} />
                                         </div>
-                                        <div className="flex gap-4 text-xs text-tertiary flex-shrink-0 w-32 justify-end">
-                                            <span><span className="font-semibold text-primary">{p.goals}</span> G</span>
-                                            <span><span className="font-semibold text-primary">{p.assists}</span> A</span>
-                                            {p.potm > 0 && <span className="text-warning-primary"><span className="font-semibold">{p.potm}</span>★</span>}
+                                        <div className="flex gap-1.5 md:gap-4 text-xs text-tertiary flex-shrink-0 md:w-32 md:justify-end">
+                                            <span className="whitespace-nowrap"><span className="font-semibold text-primary">{p.goals}</span> <span className="hidden sm:inline">G</span></span>
+                                            <span className="whitespace-nowrap"><span className="font-semibold text-primary">{p.assists}</span> <span className="hidden sm:inline">A</span></span>
+                                            {p.potm > 0 && <span className="text-warning-primary whitespace-nowrap"><span className="font-semibold">{p.potm}</span>★</span>}
                                         </div>
                                     </div>
                                 );
