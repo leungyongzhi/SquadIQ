@@ -27,6 +27,15 @@ export default function DashboardContent() {
     const [loading, setLoading] = useState(true);
     const [linkingCode, setLinkingCode] = useState<string | null>(null);
     const [showCopySuccess, setShowCopySuccess] = useState(false);
+    const [communities, setCommunities] = useState<any[]>([]);
+    const [players, setPlayers] = useState<any[]>([]);
+    const [linkingRequest, setLinkingRequest] = useState<{
+        type: "link_existing" | "create_new";
+        selectedPlayerId: string | null;
+        newPlayerName: string;
+        selectedCommunityId: string;
+    } | null>(null);
+    const [linkingSubmitted, setLinkingSubmitted] = useState(false);
     const supabase = createClient();
 
     const linkToken = searchParams.get("link");
@@ -49,6 +58,9 @@ export default function DashboardContent() {
                 setLinkedPlayerId(profile.player_id);
                 setPlayerName(profile.full_name || "Player");
                 await loadPlayerStats(profile.player_id);
+            } else {
+                // Load communities and players for linking request
+                await loadCommunitiesAndPlayers();
             }
 
             setLoading(false);
@@ -119,6 +131,58 @@ export default function DashboardContent() {
         }
     };
 
+    const loadCommunitiesAndPlayers = async () => {
+        const { data: commsData } = await supabase
+            .from("communities")
+            .select("id, name")
+            .eq("is_active", true)
+            .order("name");
+
+        const { data: playersData } = await supabase
+            .from("players")
+            .select("id, name")
+            .eq("is_active", true)
+            .order("name");
+
+        setCommunities(commsData ?? []);
+        setPlayers(playersData ?? []);
+    };
+
+    const submitLinkingRequest = async () => {
+        if (!linkingRequest || !linkingRequest.selectedCommunityId) {
+            alert("Please select a community");
+            return;
+        }
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const requestData: any = {
+            user_id: user.id,
+            community_id: linkingRequest.selectedCommunityId,
+            request_type: linkingRequest.type,
+            status: "pending",
+        };
+
+        if (linkingRequest.type === "link_existing") {
+            requestData.player_id = linkingRequest.selectedPlayerId;
+        } else {
+            requestData.player_name = linkingRequest.newPlayerName;
+        }
+
+        const { error } = await supabase
+            .from("linking_requests")
+            .insert(requestData);
+
+        if (error) {
+            alert(`Error submitting request: ${error.message}`);
+            return;
+        }
+
+        setLinkingSubmitted(true);
+        setLinkingRequest(null);
+    };
+
     const showAdminView = (isAdmin || isSuperAdmin) && view === "admin";
 
     if (loading) {
@@ -171,19 +235,137 @@ export default function DashboardContent() {
             {!showAdminView && (
                 <>
                     {/* Account Linking Section */}
-                    {!linkedPlayerId && (
+                    {!linkedPlayerId && !linkingSubmitted && (
                         <div className="bg-primary rounded-2xl border border-secondary p-6">
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start gap-4 mb-6">
                                 <div className="size-12 rounded-lg bg-brand-secondary flex items-center justify-center flex-shrink-0">
                                     <Link01 className="size-6 text-brand-primary" />
                                 </div>
                                 <div className="flex-1">
-                                    <h2 className="text-lg font-semibold text-primary mb-1">Link Your Player Account</h2>
-                                    <p className="text-sm text-tertiary mb-4">
-                                        Ask your admin for a linking URL to connect your account to a player profile.
+                                    <h2 className="text-lg font-semibold text-primary mb-1">Request Account Linking</h2>
+                                    <p className="text-sm text-tertiary">
+                                        Link your account to an existing player profile or create a new one. An admin will review and approve your request.
                                     </p>
-                                    <p className="text-xs text-quaternary">
-                                        Once linked, you'll see your stats, match history, and team information here.
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {/* Community Selection */}
+                                <div>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Community</label>
+                                    <select
+                                        value={linkingRequest?.selectedCommunityId ?? ""}
+                                        onChange={(e) =>
+                                            setLinkingRequest((prev) => ({
+                                                ...prev || { type: "link_existing", selectedPlayerId: null, newPlayerName: "", selectedCommunityId: "" },
+                                                selectedCommunityId: e.target.value,
+                                            }))
+                                        }
+                                        className="w-full px-3.5 py-2.5 rounded-lg border border-primary bg-primary text-primary text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                    >
+                                        <option value="">Select a community</option>
+                                        {communities.map((c) => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Request Type Toggle */}
+                                <div>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Request Type</label>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setLinkingRequest((prev) => ({
+                                                ...prev || { type: "link_existing", selectedPlayerId: null, newPlayerName: "", selectedCommunityId: "" },
+                                                type: "link_existing",
+                                            }))}
+                                            className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                                linkingRequest?.type === "link_existing"
+                                                    ? "bg-brand-solid text-white"
+                                                    : "bg-secondary text-tertiary hover:text-secondary"
+                                            }`}
+                                        >
+                                            Link Existing Player
+                                        </button>
+                                        <button
+                                            onClick={() => setLinkingRequest((prev) => ({
+                                                ...prev || { type: "create_new", selectedPlayerId: null, newPlayerName: "", selectedCommunityId: "" },
+                                                type: "create_new",
+                                            }))}
+                                            className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                                linkingRequest?.type === "create_new"
+                                                    ? "bg-brand-solid text-white"
+                                                    : "bg-secondary text-tertiary hover:text-secondary"
+                                            }`}
+                                        >
+                                            Create New Profile
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Conditional Fields */}
+                                {linkingRequest?.type === "link_existing" && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-secondary mb-2">Select Player</label>
+                                        <select
+                                            value={linkingRequest.selectedPlayerId ?? ""}
+                                            onChange={(e) =>
+                                                setLinkingRequest((prev) => ({
+                                                    ...prev!,
+                                                    selectedPlayerId: e.target.value,
+                                                }))
+                                            }
+                                            className="w-full px-3.5 py-2.5 rounded-lg border border-primary bg-primary text-primary text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                        >
+                                            <option value="">Select a player</option>
+                                            {players.map((p) => (
+                                                <option key={p.id} value={p.id}>{p.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
+                                {linkingRequest?.type === "create_new" && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-secondary mb-2">Your Player Name</label>
+                                        <input
+                                            type="text"
+                                            value={linkingRequest.newPlayerName}
+                                            onChange={(e) =>
+                                                setLinkingRequest((prev) => ({
+                                                    ...prev!,
+                                                    newPlayerName: e.target.value,
+                                                }))
+                                            }
+                                            placeholder="e.g. John Smith"
+                                            className="w-full px-3.5 py-2.5 rounded-lg border border-primary bg-primary text-primary text-sm placeholder:text-placeholder focus:outline-none focus:ring-2 focus:ring-brand"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Submit Button */}
+                                <button
+                                    onClick={submitLinkingRequest}
+                                    disabled={!linkingRequest?.selectedCommunityId || (linkingRequest?.type === "link_existing" && !linkingRequest?.selectedPlayerId) || (linkingRequest?.type === "create_new" && !linkingRequest?.newPlayerName)}
+                                    className="w-full px-4 py-2.5 bg-brand-solid hover:bg-brand-solid_hover disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition"
+                                >
+                                    Submit Request
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Linking Request Submitted */}
+                    {!linkedPlayerId && linkingSubmitted && (
+                        <div className="bg-success-secondary rounded-2xl border border-success-primary p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="size-12 rounded-lg bg-success-primary flex items-center justify-center flex-shrink-0">
+                                    <CheckCircle className="size-6 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-semibold text-success-primary mb-1">Request Submitted</h2>
+                                    <p className="text-sm text-success-primary">
+                                        Your linking request has been submitted. An admin will review it shortly and contact you with the result.
                                     </p>
                                 </div>
                             </div>
