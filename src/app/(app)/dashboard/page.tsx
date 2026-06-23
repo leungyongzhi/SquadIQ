@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useViewMode } from "@/app/(app)/layout";
-import { Copy07, CheckCircle, Link01, Trophy01, Zap, TrendingUp } from "@untitledui/icons";
+import { Copy07, CheckCircle, Link01, Trophy01, Zap, TrendUp02 } from "@untitledui/icons";
 
 interface PlayerStats {
     goals: number;
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                                 color="success"
                             />
                             <StatCard
-                                icon={TrendingUp}
+                                icon={TrendUp02}
                                 label="Matches Played"
                                 value={playerStats.matches}
                                 color="warning"
