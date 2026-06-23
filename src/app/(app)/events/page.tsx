@@ -243,23 +243,23 @@ export default function EventsPage() {
             ) : (
                 <div className="space-y-3">
                     {filtered.map((event) => (
-                        <div key={event.id} className="relative flex items-center gap-4 bg-primary rounded-xl border border-secondary p-4 hover:border-brand hover:shadow-sm transition duration-100 ease-linear">
+                        <div key={event.id} className="relative flex flex-col gap-3 bg-primary rounded-xl border border-secondary p-4 hover:border-brand hover:shadow-sm transition duration-100 ease-linear md:flex-row md:items-center md:gap-4">
                             <Link href={`/events/${event.id}`} className="absolute inset-0 rounded-xl" />
                             <div className="flex size-12 items-center justify-center rounded-xl bg-brand-secondary flex-shrink-0">
                                 <Calendar className="size-5 text-brand-primary" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <p className="text-sm font-semibold text-primary truncate">{event.title}</p>
+                                <div className="flex flex-wrap items-center gap-2 mb-1">
+                                    <p className="text-sm font-semibold text-primary">{event.title}</p>
                                     {statusBadge(event.status)}
                                     {!event.community_id && isAdmin && (
                                         <span className="text-xs text-warning-primary bg-warning-primary px-1.5 py-0.5 rounded">No community</span>
                                     )}
                                 </div>
-                                <div className="flex items-center gap-3 text-xs text-tertiary">
+                                <div className="flex flex-col gap-1 text-xs text-tertiary md:flex-row md:items-center md:gap-3">
                                     <span className="flex items-center gap-1">
                                         <Clock className="size-3.5" />
-                                        {new Date(event.event_date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" })} · {event.event_time?.slice(0, 5)}
+                                        {new Date(event.event_date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · {event.event_time?.slice(0, 5)}
                                     </span>
                                     {event.location && (
                                         <span className="flex items-center gap-1">
@@ -276,7 +276,7 @@ export default function EventsPage() {
                                         onClick={(e) => e.stopPropagation()}
                                         className="relative z-10 inline-flex items-center gap-1 text-xs text-brand-secondary hover:text-brand-primary transition duration-100 ease-linear mt-1"
                                     >
-                                        <Link01 className="size-3" /> Open in Google Maps
+                                        <Link01 className="size-3" /> Maps
                                     </a>
                                 )}
                                 {event.status === "completed" && (

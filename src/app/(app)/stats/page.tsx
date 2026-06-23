@@ -363,11 +363,15 @@ function StatTable({ title, icon: Icon, rows, emptyText }: {
                     <p className="text-sm text-tertiary text-center py-8">{emptyText ?? "No data yet"}</p>
                 ) : (
                     rows.map((row, i) => (
-                        <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-                            <span className="text-sm text-quaternary w-4 font-semibold">{i + 1}</span>
-                            <span className="flex-1 text-sm font-medium text-primary">{row.name}</span>
-                            <span className="text-sm font-bold text-primary">{row.value}</span>
-                            <span className="text-xs text-tertiary">{row.label}</span>
+                        <div key={i} className="flex items-center justify-between gap-2 px-4 py-2.5 md:gap-3">
+                            <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+                                <span className="text-xs md:text-sm text-quaternary w-5 font-semibold text-center">{i + 1}</span>
+                                <span className="flex-1 text-xs md:text-sm font-medium text-primary truncate">{row.name}</span>
+                            </div>
+                            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                                <span className="text-xs md:text-sm font-bold text-primary">{row.value}</span>
+                                <span className="text-xs text-tertiary whitespace-nowrap">{row.label}</span>
+                            </div>
                         </div>
                     ))
                 )}
