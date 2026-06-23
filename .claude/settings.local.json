@@ -5,7 +5,8 @@
       "Bash(curl -fsSL https://bun.sh/install)",
       "Bash(bash)",
       "Bash(export BUN_INSTALL=\"$HOME/.bun\")",
-      "Bash(export PATH=\"$BUN_INSTALL/bin:$PATH\")"
+      "Bash(export PATH=\"$BUN_INSTALL/bin:$PATH\")",
+      "Bash(bun add *)"
     ]
   }
 }

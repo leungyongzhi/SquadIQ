@@ -3,13 +3,13 @@
   "configurations": [
     {
       "name": "DBX Events – Dev Server",
-      "runtimeExecutable": "bun",
+      "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
     },
     {
       "name": "DBX Events – Production Preview",
-      "runtimeExecutable": "bun",
+      "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start"],
       "port": 3000
     }
