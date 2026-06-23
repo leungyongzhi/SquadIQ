@@ -13,7 +13,7 @@ export default function RootPage() {
         const checkAuth = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
-                router.push("/dashboard");
+                router.push("/communities");
             } else {
                 router.push("/login");
             }
