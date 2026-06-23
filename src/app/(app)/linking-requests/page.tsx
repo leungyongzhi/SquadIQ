@@ -14,6 +14,7 @@ interface LinkingRequest {
     player_name: string | null;
     community_id: string;
     status: "pending" | "approved" | "rejected";
+    rejection_reason: string | null;
     user?: { full_name: string };
     player?: { name: string };
     community?: { name: string };
