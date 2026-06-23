@@ -349,7 +349,6 @@ function RequestCard({
                     )}
                     </div>
                 </div>
-                </div>
             </div>
         </div>
     );
