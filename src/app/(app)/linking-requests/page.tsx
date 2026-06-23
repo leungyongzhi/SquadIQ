@@ -38,26 +38,47 @@ export default function LinkingRequestsPage() {
         try {
             let query = supabase
                 .from("linking_requests")
-                .select("*");
+                .select(`
+                    *,
+                    player:player_id(name),
+                    community:community_id(name)
+                `);
 
             if (filter === "pending") {
                 query = query.eq("status", "pending");
             }
 
-            const { data, error } = await query.order("created_at", { ascending: false });
-
-            console.log("Linking requests query result:", { data, error });
+            const { data: requests, error } = await query.order("created_at", { ascending: false });
 
             if (error) {
                 console.error("Error loading requests:", error);
                 alert(`Error: ${error.message}`);
+                setRequests([]);
             } else {
-                console.log("Loaded requests:", data);
-                setRequests(data ?? []);
+                // Fetch user profiles separately to get full names
+                if (requests && requests.length > 0) {
+                    const userIds = requests.map((r: any) => r.user_id);
+                    const { data: profiles } = await supabase
+                        .from("user_profiles")
+                        .select("id, full_name")
+                        .in("id", userIds);
+
+                    const profileMap = Object.fromEntries(
+                        (profiles ?? []).map((p: any) => [p.id, p.full_name])
+                    );
+
+                    const enriched = requests.map((r: any) => ({
+                        ...r,
+                        user: { full_name: profileMap[r.user_id] || "Unknown User" },
+                    }));
+
+                    setRequests(enriched);
+                } else {
+                    setRequests([]);
+                }
             }
         } catch (err) {
             console.error("Exception loading requests:", err);
-            alert(`Exception: ${err}`);
         }
         setLoading(false);
     };
@@ -241,23 +262,24 @@ function RequestCard({
 
     return (
         <div className="bg-primary rounded-xl border border-secondary p-4">
-            <div className="flex items-start gap-4">
-                {/* Status Badge */}
-                <div className={`size-10 rounded-lg ${statusColors[request.status]} flex items-center justify-center flex-shrink-0`}>
-                    <StatusIcon className="size-5" />
-                </div>
+            <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-4">
+                    {/* Status Badge */}
+                    <div className={`size-10 rounded-lg ${statusColors[request.status]} flex items-center justify-center flex-shrink-0`}>
+                        <StatusIcon className="size-5" />
+                    </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
-                        <div>
+                        <div className="flex-1">
                             <p className="font-semibold text-primary">
                                 {request.user?.full_name || "Unknown User"}
                             </p>
                             <p className="text-sm text-tertiary mt-1">
                                 {request.request_type === "link_existing"
-                                    ? `Requesting to link to: ${request.player?.name}`
-                                    : `Creating new profile: ${request.player_name}`}
+                                    ? `Requesting to link to: ${request.player?.name || "Unknown Player"}`
+                                    : `Creating new profile: ${request.player_name || "No name provided"}`}
                             </p>
                             <p className="text-xs text-quaternary mt-1">
                                 Community: {request.community?.name} • {new Date(request.created_at).toLocaleDateString()}
