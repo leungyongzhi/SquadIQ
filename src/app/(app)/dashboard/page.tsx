@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useViewMode } from "@/app/(app)/layout";
-import { Copy0707, CheckCircle, Link01, Users01, BarChart01, Calendar } from "@untitledui/icons";
+import { Copy07, CheckCircle, Link01, Users01, BarChart01, Calendar } from "@untitledui/icons";
 
 export default function DashboardPage() {
     const router = useRouter();
