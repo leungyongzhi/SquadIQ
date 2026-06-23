@@ -364,7 +364,7 @@ export default function EventDetailPage() {
         <div className="max-w-6xl">
             <Link href="/events" className="inline-flex items-center gap-1.5 text-sm text-tertiary hover:text-primary transition duration-100 ease-linear mb-6"><ArrowLeft className="size-4" />Match Days</Link>
 
-            <div className="flex gap-6 items-start">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
                 {/* ── Left column ── */}
                 <div className="flex-1 min-w-0 space-y-6">
 
@@ -743,7 +743,7 @@ export default function EventDetailPage() {
 
                 {/* ── Right column — generate + teams ── */}
                 {isAdmin && (
-                        <div className="w-80 flex-shrink-0 sticky top-6 self-start space-y-4">
+                        <div className="w-full lg:w-80 flex-shrink-0 lg:sticky lg:top-6 lg:self-start space-y-4">
                             {/* Generate button */}
                             <button onClick={handleGenerateTeams} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-solid hover:bg-brand-solid_hover text-white text-sm font-semibold rounded-xl transition duration-100 ease-linear">
                                 <Lightning01 className="size-4" /> Generate Teams
