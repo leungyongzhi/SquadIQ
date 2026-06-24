@@ -76,13 +76,19 @@ export default function FootballLayout({ children }: { children: React.ReactNode
             setIsAdmin(admin);
 
             // Fetch which communities this user admins
-            if (profile?.player_id && !superAdmin) {
+            if (profile?.player_id) {
                 const { data: memberships } = await supabase
                     .from("community_members")
                     .select("community_id")
                     .eq("player_id", profile.player_id)
                     .eq("role", "admin");
-                setAdminCommunityIds((memberships ?? []).map((m) => m.community_id));
+                const communityIds = (memberships ?? []).map((m) => m.community_id);
+                setAdminCommunityIds(communityIds);
+
+                // If they have community admin roles but not global admin role, set them as admin
+                if (!admin && communityIds.length > 0) {
+                    setIsAdmin(true);
+                }
             }
         });
 
