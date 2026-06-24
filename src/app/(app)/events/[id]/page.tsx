@@ -638,42 +638,46 @@ export default function EventDetailPage() {
                                     const inBlue = (event.team_blue_ids ?? []).includes(pid);
                                     const inOrange = (event.team_orange_ids ?? []).includes(pid);
                                     return (
-                                        <div key={pid} className="flex flex-wrap items-center gap-2 px-4 py-3">
-                                            <AvatarCircle src={member.player.avatar_url} name={member.player.name} size={8} />
-                                            <span className="text-sm font-medium text-primary flex-1 min-w-0 truncate">{member.player.name}</span>
-                                            <PositionBadge bias={member.position_bias} isGK={member.is_goalkeeper} />
-                                            <button
-                                                onClick={() => assignTeam(pid, inBlue ? null : "blue")}
-                                                disabled={!!actionInProgress}
-                                                className={cx("px-2.5 py-1 rounded-lg text-xs font-semibold border transition duration-100 ease-linear disabled:opacity-50",
-                                                    inBlue
-                                                        ? "bg-[#1570EF] border-[#1570EF] text-white"
-                                                        : "border-secondary text-quaternary hover:bg-[#1570EF] hover:border-[#1570EF] hover:text-white")}>
-                                                Blue
-                                            </button>
-                                            <button
-                                                onClick={() => assignTeam(pid, inOrange ? null : "orange")}
-                                                disabled={!!actionInProgress}
-                                                className={cx("px-2.5 py-1 rounded-lg text-xs font-semibold border transition duration-100 ease-linear disabled:opacity-50",
-                                                    inOrange ? "bg-warning-solid text-white border-warning" : "border-secondary text-quaternary hover:bg-warning-primary hover:border-warning hover:text-warning-primary")}>
-                                                Orange
-                                            </button>
-                                            <PayBadge hasPaid={enrollment.has_paid ?? false} isAdmin={true} onClick={() => adminTogglePaid(enrollment.id, enrollment.has_paid ?? false)} loading={actionInProgress === `paid-${enrollment.id}`} />
-                                            <button onClick={() => setAttendance(enrollment.id, "late", enrollment.attendance_status)} disabled={!!actionInProgress}
-                                                className={cx("px-2 py-1 rounded-lg text-xs font-semibold border transition duration-100 ease-linear disabled:opacity-50",
-                                                    enrollment.attendance_status === "late" ? "bg-warning-solid text-white border-warning" : "border-secondary text-quaternary hover:border-warning hover:text-warning-primary")}>
-                                                Late
-                                            </button>
-                                            <button onClick={() => setAttendance(enrollment.id, "no_show", enrollment.attendance_status)} disabled={!!actionInProgress}
-                                                className={cx("px-2 py-1 rounded-lg text-xs font-semibold border transition duration-100 ease-linear disabled:opacity-50",
-                                                    enrollment.attendance_status === "no_show" ? "bg-error-solid text-white border-error" : "border-secondary text-quaternary hover:border-error hover:text-error-primary")}>
-                                                No show
-                                            </button>
-                                            <button onClick={() => adminToggleEnroll(member.player_id)} disabled={!!actionInProgress}
-                                                className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium border border-secondary text-quaternary hover:bg-error-secondary hover:text-error-primary hover:border-error transition duration-100 ease-linear disabled:opacity-50">
-                                                <XCircle className="size-3.5" /> Remove
-                                            </button>
-                                            {event.voting_open && <button onClick={() => votePotm(pid)} disabled={votingForPotm} className="text-xs p-1.5 border border-secondary text-tertiary rounded-lg hover:bg-primary_hover transition duration-100 ease-linear disabled:opacity-50"><Trophy01 className="size-3.5" /></button>}
+                                        <div key={pid} className="flex flex-col gap-2 px-4 py-3 border-b border-secondary last:border-b-0 md:flex-row md:items-center md:gap-2">
+                                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                <AvatarCircle src={member.player.avatar_url} name={member.player.name} size={8} />
+                                                <span className="text-sm font-medium text-primary min-w-0">{member.player.name}</span>
+                                                <PositionBadge bias={member.position_bias} isGK={member.is_goalkeeper} />
+                                            </div>
+                                            <div className="flex flex-wrap items-center gap-1.5">
+                                                <button
+                                                    onClick={() => assignTeam(pid, inBlue ? null : "blue")}
+                                                    disabled={!!actionInProgress}
+                                                    className={cx("px-2 py-1 rounded-lg text-xs font-semibold border transition duration-100 ease-linear disabled:opacity-50",
+                                                        inBlue
+                                                            ? "bg-[#1570EF] border-[#1570EF] text-white"
+                                                            : "border-secondary text-quaternary hover:bg-[#1570EF] hover:border-[#1570EF] hover:text-white")}>
+                                                    Blue
+                                                </button>
+                                                <button
+                                                    onClick={() => assignTeam(pid, inOrange ? null : "orange")}
+                                                    disabled={!!actionInProgress}
+                                                    className={cx("px-2 py-1 rounded-lg text-xs font-semibold border transition duration-100 ease-linear disabled:opacity-50",
+                                                        inOrange ? "bg-warning-solid text-white border-warning" : "border-secondary text-quaternary hover:bg-warning-primary hover:border-warning hover:text-warning-primary")}>
+                                                    Orange
+                                                </button>
+                                                <PayBadge hasPaid={enrollment.has_paid ?? false} isAdmin={true} onClick={() => adminTogglePaid(enrollment.id, enrollment.has_paid ?? false)} loading={actionInProgress === `paid-${enrollment.id}`} />
+                                                <button onClick={() => setAttendance(enrollment.id, "late", enrollment.attendance_status)} disabled={!!actionInProgress}
+                                                    className={cx("px-2 py-1 rounded-lg text-xs font-semibold border transition duration-100 ease-linear disabled:opacity-50",
+                                                        enrollment.attendance_status === "late" ? "bg-warning-solid text-white border-warning" : "border-secondary text-quaternary hover:border-warning hover:text-warning-primary")}>
+                                                    Late
+                                                </button>
+                                                <button onClick={() => setAttendance(enrollment.id, "no_show", enrollment.attendance_status)} disabled={!!actionInProgress}
+                                                    className={cx("px-2 py-1 rounded-lg text-xs font-semibold border transition duration-100 ease-linear disabled:opacity-50",
+                                                        enrollment.attendance_status === "no_show" ? "bg-error-solid text-white border-error" : "border-secondary text-quaternary hover:border-error hover:text-error-primary")}>
+                                                    No show
+                                                </button>
+                                                <button onClick={() => adminToggleEnroll(member.player_id)} disabled={!!actionInProgress}
+                                                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium border border-secondary text-quaternary hover:bg-error-secondary hover:text-error-primary hover:border-error transition duration-100 ease-linear disabled:opacity-50">
+                                                    <XCircle className="size-3.5" />
+                                                </button>
+                                                {event.voting_open && <button onClick={() => votePotm(pid)} disabled={votingForPotm} className="text-xs p-1.5 border border-secondary text-tertiary rounded-lg hover:bg-primary_hover transition duration-100 ease-linear disabled:opacity-50"><Trophy01 className="size-3.5" /></button>}
+                                            </div>
                                         </div>
                                     );
                                 })}
