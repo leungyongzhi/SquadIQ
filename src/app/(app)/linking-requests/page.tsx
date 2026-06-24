@@ -107,10 +107,23 @@ export default function LinkingRequestsPage() {
             playerId = newPlayer.id;
         }
 
-        // Link user to player
+        // Check if the player being linked to has admin role in any community
+        const { data: adminMemberships } = await supabase
+            .from("community_members")
+            .select("role")
+            .eq("player_id", playerId)
+            .eq("role", "admin")
+            .limit(1);
+
+        const isAdmin = (adminMemberships ?? []).length > 0;
+
+        // Link user to player and update role if admin
         const { error: linkError } = await supabase
             .from("user_profiles")
-            .update({ player_id: playerId })
+            .update({
+                player_id: playerId,
+                role: isAdmin ? "admin" : "player"
+            })
             .eq("id", request.user_id);
 
         if (linkError) {
