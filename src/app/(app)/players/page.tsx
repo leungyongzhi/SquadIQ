@@ -208,7 +208,7 @@ function PlayerFormModal({ player, isAdmin, communities, onSave, onClose }: {
             }
 
             const path = `avatars/${Date.now()}.${ext}`;
-            const { error, data } = await supabase.storage.from("football-assets").upload(path, file, { upsert: true });
+            const { error, data } = await supabase.storage.from("squadIQ-assets").upload(path, file, { upsert: true });
 
             if (error) {
                 setUploadError(error.message || "Upload failed");
@@ -216,7 +216,7 @@ function PlayerFormModal({ player, isAdmin, communities, onSave, onClose }: {
                 return;
             }
 
-            const { data: publicUrlData } = supabase.storage.from("football-assets").getPublicUrl(path);
+            const { data: publicUrlData } = supabase.storage.from("squadIQ-assets").getPublicUrl(path);
             setForm((f) => ({ ...f, avatar_url: publicUrlData.publicUrl }));
             if (fileRef.current) fileRef.current.value = "";
         } catch (err: any) {
