@@ -107,7 +107,17 @@ export default function LinkingRequestsPage() {
             playerId = newPlayer.id;
         }
 
-        // Find the user account linked to this player (if any) to get their role
+        // Check if player is admin in any community
+        const { data: communityAdminMemberships } = await supabase
+            .from("community_members")
+            .select("role")
+            .eq("player_id", playerId)
+            .eq("role", "admin")
+            .limit(1);
+
+        const isAdminInCommunity = (communityAdminMemberships ?? []).length > 0;
+
+        // Also check if the linked player's user has admin role
         const { data: linkedUserProfiles } = await supabase
             .from("user_profiles")
             .select("role")
@@ -115,7 +125,7 @@ export default function LinkingRequestsPage() {
             .limit(1);
 
         const linkedUserRole = (linkedUserProfiles ?? [])[0]?.role;
-        const isAdmin = linkedUserRole === "admin" || linkedUserRole === "super_admin";
+        const isAdmin = isAdminInCommunity || linkedUserRole === "admin" || linkedUserRole === "super_admin";
         const isSuperAdmin = linkedUserRole === "super_admin";
         const roleToAssign = isSuperAdmin ? "super_admin" : isAdmin ? "admin" : "player";
 
