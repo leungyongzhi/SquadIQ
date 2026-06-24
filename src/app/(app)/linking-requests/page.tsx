@@ -136,6 +136,27 @@ export default function LinkingRequestsPage() {
             .eq("id", request.user_id)
             .single();
 
+        // If approving as admin but no player created yet, create one
+        if (request.request_type === "create_new" && !playerId && roleToAssign === "admin") {
+            const { data: newAdminPlayer, error: createAdminError } = await supabase
+                .from("players")
+                .insert({
+                    name: request.player_name || "Admin Player",
+                    is_active: true,
+                    rating: 3,
+                    position_bias: 3,
+                    is_goalkeeper: false,
+                })
+                .select()
+                .single();
+
+            if (createAdminError) {
+                alert(`Error creating admin player: ${createAdminError.message}`);
+                return;
+            }
+            playerId = newAdminPlayer.id;
+        }
+
         // Link user to player and transfer their role
         let linkError;
         if (existingProfile) {

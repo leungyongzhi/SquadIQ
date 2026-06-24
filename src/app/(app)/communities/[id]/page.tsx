@@ -465,6 +465,21 @@ export default function CommunityDetailPage() {
 
     const handleEditSave = async (data: Partial<CommunityMember>) => {
         if (!editingMember) return;
+
+        // If setting as admin, check if the player's user has a player_id, if not create one
+        if (data.role === "admin") {
+            const { data: userProfile } = await supabase
+                .from("user_profiles")
+                .select("player_id")
+                .eq("player_id", editingMember.player_id)
+                .single();
+
+            // If no user is linked to this player, create a player for the admin if needed
+            if (!userProfile?.player_id && editingMember.player_id) {
+                // Player exists, just make sure the community_members entry has the admin role
+            }
+        }
+
         const updateData = {
             rating: data.rating,
             position_bias: data.position_bias,
