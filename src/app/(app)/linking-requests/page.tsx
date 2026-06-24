@@ -212,9 +212,14 @@ export default function LinkingRequestsPage() {
                 is_goalkeeper: false,
             });
 
-        if (memberError && !memberError.message.includes("duplicate")) {
-            alert(`Error adding to community: ${memberError.message}`);
-            return;
+        if (memberError) {
+            if (!memberError.message.includes("duplicate")) {
+                console.error("Community member insert error:", memberError);
+                alert(`Error adding to community: ${memberError.message}`);
+                return;
+            }
+        } else {
+            console.log("Successfully added player to community");
         }
 
         // Reload requests
