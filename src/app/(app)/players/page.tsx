@@ -1100,7 +1100,7 @@ export default function PlayersPage() {
                             key={player.id}
                             player={player}
                             stats={stats[player.id] ?? { games: 0, goals: 0, assists: 0, potm: 0 }}
-                            isAdmin={isAdmin}
+                            isAdmin={isAdmin && (isSuperAdmin || (selectedTab !== "all" && selectedTab !== "global" && adminCommunityIds.includes(selectedTab)))}
                             isPublic={(player as any).is_public ?? false}
                             communityNames={player.communityNames ?? []}
                             showCommunities={selectedTab === "all" && isSuperAdmin}
