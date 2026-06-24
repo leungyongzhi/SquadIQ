@@ -817,10 +817,17 @@ export default function PlayersPage() {
             }
             const { data: members } = await supabase
                 .from("community_members")
-                .select("player_id, player:players(*)")
+                .select("player_id, rating, position_bias, is_goalkeeper, gk_rating, outfield_rating, player:players(id, name, avatar_url, is_active)")
                 .eq("community_id", tab);
 
-            const communityPlayers = (members ?? []).map((m: any) => m.player).filter(Boolean);
+            const communityPlayers = (members ?? []).map((m: any) => ({
+                ...m.player,
+                rating: m.rating,
+                position_bias: m.position_bias,
+                is_goalkeeper: m.is_goalkeeper,
+                gk_rating: m.gk_rating,
+                outfield_rating: m.outfield_rating,
+            })).filter(Boolean);
             const playerIds = communityPlayers.map((p: any) => p.id);
 
             // Fetch linked user accounts
