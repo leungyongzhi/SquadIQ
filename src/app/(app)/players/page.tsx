@@ -264,10 +264,18 @@ function PlayerFormModal({ player, isAdmin, communities, onSave, onClose }: {
                             </div>
                             <div>
                                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
-                                <button type="button" onClick={() => fileRef.current?.click()} disabled={uploadingAvatar}
-                                    className={cx("flex items-center gap-1.5 text-sm transition duration-100 ease-linear", uploadingAvatar ? "text-tertiary cursor-not-allowed opacity-50" : "text-brand-secondary hover:text-brand-secondary_hover")}>
-                                    <Upload01 className="size-4" /> {uploadingAvatar ? "Uploading..." : "Upload photo"}
-                                </button>
+                                <div className="flex gap-2">
+                                    <button type="button" onClick={() => fileRef.current?.click()} disabled={uploadingAvatar}
+                                        className={cx("flex items-center gap-1.5 text-sm transition duration-100 ease-linear", uploadingAvatar ? "text-tertiary cursor-not-allowed opacity-50" : "text-brand-secondary hover:text-brand-secondary_hover")}>
+                                        <Upload01 className="size-4" /> {uploadingAvatar ? "Uploading..." : "Upload photo"}
+                                    </button>
+                                    {form.avatar_url && (
+                                        <button type="button" onClick={() => setForm((f) => ({ ...f, avatar_url: "" }))}
+                                            className="flex items-center gap-1.5 text-sm text-error-primary hover:text-error-secondary transition duration-100 ease-linear">
+                                            <Trash01 className="size-4" /> Remove
+                                        </button>
+                                    )}
+                                </div>
                                 {uploadError && <p className="text-xs text-error-primary mt-1">{uploadError}</p>}
                                 <p className="text-xs text-tertiary mt-0.5">Shown on player card</p>
                             </div>
