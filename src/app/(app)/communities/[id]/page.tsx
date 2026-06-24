@@ -465,8 +465,17 @@ export default function CommunityDetailPage() {
 
     const handleEditSave = async (data: Partial<CommunityMember>) => {
         if (!editingMember) return;
-        await supabase.from("community_members").update(data).eq("id", editingMember.id);
-        setEditingMember(null); await load();
+        const updateData = {
+            rating: data.rating,
+            position_bias: data.position_bias,
+            is_goalkeeper: data.is_goalkeeper,
+            gk_rating: data.gk_rating,
+            outfield_rating: data.outfield_rating,
+            role: data.role
+        };
+        await supabase.from("community_members").update(updateData).eq("id", editingMember.id);
+        setEditingMember(null);
+        await load();
     };
     const handleRemove = async (memberId: string) => { await supabase.from("community_members").delete().eq("id", memberId); await load(); };
     const toggleEnroll = async (event: EventWithEnrollment) => {
