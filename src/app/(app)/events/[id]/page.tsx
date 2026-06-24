@@ -723,6 +723,25 @@ export default function EventDetailPage() {
                         <div className="bg-primary rounded-2xl border border-secondary px-6 py-8 text-center text-sm text-tertiary">No players enrolled yet.</div>
                     )}
 
+                    {/* ── Enrolled players visible to all ── */}
+                    {enrolledPlayers.length > 0 && (
+                        <div className="bg-primary rounded-2xl border border-secondary overflow-hidden">
+                            <div className="px-4 md:px-6 py-4 border-b border-secondary">
+                                <h2 className="text-sm font-semibold text-primary">Enrolled Players</h2>
+                                <p className="text-xs text-tertiary mt-0.5">{enrolledPlayers.length} players</p>
+                            </div>
+                            <div className="divide-y divide-secondary">
+                                {enrolledPlayers.map((enrollment) => (
+                                    <div key={enrollment.player_id} className="flex flex-col gap-2 px-4 md:px-6 py-3 md:flex-row md:items-center md:gap-3">
+                                        <AvatarCircle src={enrollment.player.avatar_url} name={enrollment.player.name} size={8} />
+                                        <span className="text-sm font-medium text-primary flex-1">{enrollment.player.name}</span>
+                                        {enrollment.has_paid && <span className="text-xs font-semibold text-success-primary bg-success-primary px-2 py-1 rounded w-fit">Paid</span>}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* ── Teams visible to all players ── */}
                     {(savedBlue.length > 0 || savedOrange.length > 0) && (
                         <div className="bg-primary rounded-2xl border border-secondary overflow-hidden">
