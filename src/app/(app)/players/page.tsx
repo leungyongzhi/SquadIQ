@@ -165,6 +165,8 @@ function PlayerFormModal({ player, isAdmin, communities, onSave, onClose }: {
         } : DEFAULT_FORM,
     );
     const [saving, setSaving] = useState(false);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
     const supabase = createClient();
     const fileRef = useRef<HTMLInputElement>(null);
 
@@ -193,12 +195,34 @@ function PlayerFormModal({ player, isAdmin, communities, onSave, onClose }: {
     const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        const ext = file.name.split(".").pop();
-        const path = `avatars/${Date.now()}.${ext}`;
-        const { error } = await supabase.storage.from("football-assets").upload(path, file, { upsert: true });
-        if (!error) {
-            const { data } = supabase.storage.from("football-assets").getPublicUrl(path);
-            setForm((f) => ({ ...f, avatar_url: data.publicUrl }));
+
+        setUploadingAvatar(true);
+        setUploadError(null);
+
+        try {
+            const ext = file.name.split(".").pop()?.toLowerCase();
+            if (!ext) {
+                setUploadError("File must have an extension");
+                setUploadingAvatar(false);
+                return;
+            }
+
+            const path = `avatars/${Date.now()}.${ext}`;
+            const { error, data } = await supabase.storage.from("football-assets").upload(path, file, { upsert: true });
+
+            if (error) {
+                setUploadError(error.message || "Upload failed");
+                setUploadingAvatar(false);
+                return;
+            }
+
+            const { data: publicUrlData } = supabase.storage.from("football-assets").getPublicUrl(path);
+            setForm((f) => ({ ...f, avatar_url: publicUrlData.publicUrl }));
+            if (fileRef.current) fileRef.current.value = "";
+        } catch (err: any) {
+            setUploadError(err?.message || "Upload failed");
+        } finally {
+            setUploadingAvatar(false);
         }
     };
 
@@ -239,11 +263,12 @@ function PlayerFormModal({ player, isAdmin, communities, onSave, onClose }: {
                                 )}
                             </div>
                             <div>
-                                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
-                                <button type="button" onClick={() => fileRef.current?.click()}
-                                    className="flex items-center gap-1.5 text-sm text-brand-secondary hover:text-brand-secondary_hover transition duration-100 ease-linear">
-                                    <Upload01 className="size-4" /> Upload photo
+                                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
+                                <button type="button" onClick={() => fileRef.current?.click()} disabled={uploadingAvatar}
+                                    className={cx("flex items-center gap-1.5 text-sm transition duration-100 ease-linear", uploadingAvatar ? "text-tertiary cursor-not-allowed opacity-50" : "text-brand-secondary hover:text-brand-secondary_hover")}>
+                                    <Upload01 className="size-4" /> {uploadingAvatar ? "Uploading..." : "Upload photo"}
                                 </button>
+                                {uploadError && <p className="text-xs text-error-primary mt-1">{uploadError}</p>}
                                 <p className="text-xs text-tertiary mt-0.5">Shown on player card</p>
                             </div>
                         </div>
