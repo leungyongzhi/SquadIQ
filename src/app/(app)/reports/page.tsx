@@ -322,11 +322,6 @@ export default function ReportsPage() {
                                         <div className="flex-1 hidden md:block">
                                             <MiniBar value={stat} max={maxStat} />
                                         </div>
-                                        <div className="flex gap-1.5 md:gap-4 text-xs text-tertiary flex-shrink-0 md:w-32 md:justify-end">
-                                            <span className="whitespace-nowrap"><span className="font-semibold text-primary">{p.goals}</span> <span className="hidden sm:inline">G</span></span>
-                                            <span className="whitespace-nowrap"><span className="font-semibold text-primary">{p.assists}</span> <span className="hidden sm:inline">A</span></span>
-                                            {p.potm > 0 && <span className="text-warning-primary whitespace-nowrap"><span className="font-semibold">{p.potm}</span>★</span>}
-                                        </div>
                                     </div>
                                 );
                             })}
