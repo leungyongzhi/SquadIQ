@@ -107,15 +107,17 @@ export default function LinkingRequestsPage() {
             playerId = newPlayer.id;
         }
 
-        // Check if the player being linked to has admin role in any community
-        const { data: adminMemberships } = await supabase
-            .from("community_members")
+        // Find the user account linked to this player (if any) to get their role
+        const { data: linkedUserProfiles } = await supabase
+            .from("user_profiles")
             .select("role")
             .eq("player_id", playerId)
-            .eq("role", "admin")
             .limit(1);
 
-        const isAdmin = (adminMemberships ?? []).length > 0;
+        const linkedUserRole = (linkedUserProfiles ?? [])[0]?.role;
+        const isAdmin = linkedUserRole === "admin" || linkedUserRole === "super_admin";
+        const isSuperAdmin = linkedUserRole === "super_admin";
+        const roleToAssign = isSuperAdmin ? "super_admin" : isAdmin ? "admin" : "player";
 
         // Check if user_profiles record exists
         const { data: existingProfile } = await supabase
@@ -124,7 +126,7 @@ export default function LinkingRequestsPage() {
             .eq("id", request.user_id)
             .single();
 
-        // Link user to player and update role if admin
+        // Link user to player and transfer their role
         let linkError;
         if (existingProfile) {
             // Update existing profile
@@ -132,7 +134,7 @@ export default function LinkingRequestsPage() {
                 .from("user_profiles")
                 .update({
                     player_id: playerId,
-                    role: isAdmin ? "admin" : "player"
+                    role: roleToAssign
                 })
                 .eq("id", request.user_id);
             linkError = result.error;
@@ -143,7 +145,7 @@ export default function LinkingRequestsPage() {
                 .insert({
                     id: request.user_id,
                     player_id: playerId,
-                    role: isAdmin ? "admin" : "player"
+                    role: roleToAssign
                 });
             linkError = result.error;
         }
