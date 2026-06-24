@@ -729,8 +729,8 @@ export default function EventDetailPage() {
                         <div className="bg-primary rounded-2xl border border-secondary px-6 py-8 text-center text-sm text-tertiary">No players enrolled yet.</div>
                     )}
 
-                    {/* ── Enrolled players visible to all ── */}
-                    {enrolledPlayers.length > 0 && (
+                    {/* ── Enrolled players visible to all (not admins) ── */}
+                    {!isAdmin && enrolledPlayers.length > 0 && (
                         <div className="bg-primary rounded-2xl border border-secondary overflow-hidden">
                             <div className="px-4 md:px-6 py-4 border-b border-secondary">
                                 <h2 className="text-sm font-semibold text-primary">Enrolled Players</h2>
