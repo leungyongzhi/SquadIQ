@@ -334,13 +334,13 @@ function RequestCard({
                         <div className="mt-4 flex gap-2">
                             <button
                                 onClick={onApprove}
-                                className="px-3 py-2 bg-success-primary hover:opacity-90 text-white text-sm font-semibold rounded-lg transition"
+                                className="flex-1 px-4 py-2.5 bg-success-solid hover:opacity-90 text-white text-sm font-semibold rounded-lg transition"
                             >
                                 Approve
                             </button>
                             <button
                                 onClick={() => setRejecting(!rejecting)}
-                                className="px-3 py-2 bg-error-primary hover:opacity-90 text-white text-sm font-semibold rounded-lg transition"
+                                className="flex-1 px-4 py-2.5 bg-error-solid hover:opacity-90 text-white text-sm font-semibold rounded-lg transition"
                             >
                                 Reject
                             </button>
