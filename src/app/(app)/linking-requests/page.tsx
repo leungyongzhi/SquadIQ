@@ -200,6 +200,23 @@ export default function LinkingRequestsPage() {
             return;
         }
 
+        // Add player to the community
+        const { error: memberError } = await supabase
+            .from("community_members")
+            .insert({
+                community_id: request.community_id,
+                player_id: playerId,
+                role: "player",
+                rating: 3,
+                position_bias: 3,
+                is_goalkeeper: false,
+            });
+
+        if (memberError && !memberError.message.includes("duplicate")) {
+            alert(`Error adding to community: ${memberError.message}`);
+            return;
+        }
+
         // Reload requests
         await loadRequests();
     };
