@@ -117,14 +117,36 @@ export default function LinkingRequestsPage() {
 
         const isAdmin = (adminMemberships ?? []).length > 0;
 
-        // Link user to player and update role if admin
-        const { error: linkError } = await supabase
+        // Check if user_profiles record exists
+        const { data: existingProfile } = await supabase
             .from("user_profiles")
-            .update({
-                player_id: playerId,
-                role: isAdmin ? "admin" : "player"
-            })
-            .eq("id", request.user_id);
+            .select("id")
+            .eq("id", request.user_id)
+            .single();
+
+        // Link user to player and update role if admin
+        let linkError;
+        if (existingProfile) {
+            // Update existing profile
+            const result = await supabase
+                .from("user_profiles")
+                .update({
+                    player_id: playerId,
+                    role: isAdmin ? "admin" : "player"
+                })
+                .eq("id", request.user_id);
+            linkError = result.error;
+        } else {
+            // Create new profile
+            const result = await supabase
+                .from("user_profiles")
+                .insert({
+                    id: request.user_id,
+                    player_id: playerId,
+                    role: isAdmin ? "admin" : "player"
+                });
+            linkError = result.error;
+        }
 
         if (linkError) {
             alert(`Error linking player: ${linkError.message}`);
