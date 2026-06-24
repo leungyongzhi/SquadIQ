@@ -592,6 +592,9 @@ export default function EventDetailPage() {
 
                     {isAdmin && (
                         <div className="flex flex-wrap gap-2">
+                            <button onClick={handleGenerateTeams} className="flex items-center justify-center gap-2 px-4 py-2 bg-brand-solid hover:bg-brand-solid_hover text-white text-sm font-semibold rounded-lg transition duration-100 ease-linear">
+                                <Lightning01 className="size-4" /> Generate Teams
+                            </button>
                             <button onClick={toggleVoting} className={cx("flex items-center gap-2 px-3 py-2 border text-sm font-medium rounded-lg transition duration-100 ease-linear", event.voting_open ? "bg-warning-primary border-warning text-warning-primary" : "bg-primary border-secondary text-secondary hover:bg-primary_hover")}>
                                 <Star01 className="size-4" />{event.voting_open ? "Close POTM Voting" : "Open POTM Voting"}
                             </button>
