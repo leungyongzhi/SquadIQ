@@ -772,11 +772,6 @@ export default function EventDetailPage() {
                 {/* ── Right column — generate + teams ── */}
                 {isAdmin && (
                         <div className="w-full lg:w-80 flex-shrink-0 lg:sticky lg:top-6 lg:self-start space-y-4">
-                            {/* Generate button */}
-                            <button onClick={handleGenerateTeams} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-solid hover:bg-brand-solid_hover text-white text-sm font-semibold rounded-xl transition duration-100 ease-linear">
-                                <Lightning01 className="size-4" /> Generate Teams
-                            </button>
-
                             {/* Unsaved generated preview */}
                             {teams && (
                                 <div className="bg-primary rounded-2xl border border-secondary overflow-hidden">
