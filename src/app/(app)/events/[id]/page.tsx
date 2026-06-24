@@ -370,31 +370,33 @@ export default function EventDetailPage() {
 
 
                     {/* ── Event card ── */}
-                    <div className="bg-primary rounded-2xl border border-secondary p-6">
-                        <div className="flex items-start justify-between gap-4">
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className={cx("text-xs font-medium px-2 py-0.5 rounded-full", event.status === "scheduled" ? "bg-brand-secondary text-brand-primary" : event.status === "in_progress" ? "bg-warning-primary text-warning-primary" : "bg-success-primary text-success-primary")}>
-                                        {event.status === "in_progress" ? "In Progress" : event.status === "completed" ? "Completed" : "Scheduled"}
-                                    </span>
+                    <div className="bg-primary rounded-2xl border border-secondary p-4 md:p-6">
+                        <div className="flex flex-col gap-3 md:gap-4">
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className={cx("text-xs font-medium px-2 py-0.5 rounded-full", event.status === "scheduled" ? "bg-brand-secondary text-brand-primary" : event.status === "in_progress" ? "bg-warning-primary text-warning-primary" : "bg-success-primary text-success-primary")}>
+                                            {event.status === "in_progress" ? "In Progress" : event.status === "completed" ? "Completed" : "Scheduled"}
+                                        </span>
+                                    </div>
+                                    <h1 className="text-xl md:text-2xl font-semibold text-primary">{event.title}</h1>
                                 </div>
-                                <h1 className="text-2xl font-semibold text-primary">{event.title}</h1>
-                                <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-tertiary">
-                                    <span className="flex items-center gap-1.5"><Calendar className="size-4" />{new Date(event.event_date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
-                                    {event.event_time && <span className="flex items-center gap-1.5"><Clock className="size-4" />{event.event_time.slice(0, 5)}</span>}
-                                    {event.location && <span className="flex items-center gap-1.5"><MarkerPin01 className="size-4" />{event.location}</span>}
-                                </div>
-                                {event.maps_link && (
-                                    <a href={event.maps_link} target="_blank" rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1.5 mt-2 text-sm text-brand-secondary hover:text-brand-primary transition duration-100 ease-linear">
-                                        <MarkerPin01 className="size-4" /> Open in Google Maps
-                                    </a>
-                                )}
-                            </div>
-                            {myPlayerId && event.status === "scheduled" && (
-                                <button onClick={toggleEnroll} className={cx("flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition duration-100 ease-linear flex-shrink-0", amEnrolled ? "bg-error-secondary text-error-primary hover:bg-error-primary" : "bg-brand-solid hover:bg-brand-solid_hover text-white")}>
-                                    {amEnrolled ? <><XCircle className="size-4" />Leave</> : <><CheckCircle className="size-4" />Join</>}
+                                {myPlayerId && event.status === "scheduled" && (
+                                    <button onClick={toggleEnroll} className={cx("flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-semibold transition duration-100 ease-linear whitespace-nowrap", amEnrolled ? "bg-error-secondary text-error-primary hover:bg-error-primary" : "bg-brand-solid hover:bg-brand-solid_hover text-white")}>
+                                    {amEnrolled ? <><XCircle className="size-3 md:size-4" /><span className="hidden sm:inline">Leave</span></> : <><CheckCircle className="size-3 md:size-4" /><span className="hidden sm:inline">Join</span></>}
                                 </button>
+                            )}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-3 md:gap-4 text-xs md:text-sm text-tertiary">
+                                <span className="flex items-center gap-1.5"><Calendar className="size-4" />{new Date(event.event_date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span>
+                                {event.event_time && <span className="flex items-center gap-1.5"><Clock className="size-4" />{event.event_time.slice(0, 5)}</span>}
+                                {event.location && <span className="flex items-center gap-1.5 truncate"><MarkerPin01 className="size-4" />{event.location}</span>}
+                            </div>
+                            {event.maps_link && (
+                                <a href={event.maps_link} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 text-xs md:text-sm text-brand-secondary hover:text-brand-primary transition duration-100 ease-linear w-fit">
+                                    <MarkerPin01 className="size-4" /> <span className="hidden sm:inline">Open in Google Maps</span><span className="sm:hidden">Maps</span>
+                                </a>
                             )}
                         </div>
                         {(event.status === "in_progress" || event.status === "completed") && (() => {
